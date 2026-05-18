@@ -1,81 +1,139 @@
-"# 🛡️ PenTest Multi-Tool
+﻿# 🛡️ PEN-TEST MULTI-TOOL v2.1
 
-![Python](https://img.shields.io/badge/python-3.6+-blue.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
+Многофункциональный инструмент для тестирования безопасности веб-приложений.
 
-**PenTest Multi-Tool** — это консольный инструмент для автоматизации рутинных задач при проведении легального пентеста и прохождения CTF. Инструмент позволяет быстро просканировать веб-приложение на наличие базовых уязвимостей и ошибок конфигурации.
+## 🚀 Возможности
 
-## ✨ Функционал
+### 1. Header & Config Scanner
+- Проверка наличия security headers (CSP, HSTS, X-Frame-Options и др.)
+- Анализ CORS политик
+- Поиск чувствительных файлов (.env, config.php, backup файлы и т.д.)
+- Обнаружение открытых административных панелей
 
-### 1. 🔍 Header & Config Scanner
-- Проверка наличия основных заголовков безопасности (`CSP`, `HSTS`, `X-Frame-Options` и др.).
-- Поиск забытых чувствительных файлов (`.env`, `.git/config`, `docker-compose.yml`, `phpinfo.php` и др.).
-- Анализ политики CORS на предмет избыточного доверия (`Access-Control-Allow-Origin: *`).
+### 2. JS File Analyzer
+- Поиск API endpoints в JavaScript файлах
+- Обнаружение утечек ключей (Firebase, AWS, GitHub, Stripe и др.)
+- Поиск JWT токенов
+- Обнаружение внутренних IP адресов
+- Поиск email адресов и телефонов
 
-### 2. 📜 JS Analyzer
-- Автоматический поиск и скачивание всех `.js` файлов с целевой страницы.
-- Поиск API-эндпоинтов (например, `/api/v1/...`) с помощью регулярных выражений.
-- Поиск случайно оставленных ключей Firebase, AWS и других секретов.
+### 3. XSS Scanner
+- Автоматическое обнаружение форм на странице
+- Тестирование различных XSS payloads
+- Проверка reflected XSS
+- Поддержка различных bypass техник
 
-### 3. 💉 XSS Form Scanner
-- Поиск всех полей `<input>` и `<textarea>` на странице.
-- Тестирование полей с помощью базовых XSS-пейлоадов.
-- Анализ ответа сервера на предмет фильтрации или кодирования спецсимволов.
+### 4. SQL Injection Scanner
+- Тестирование GET параметров
+- Тестирование форм (POST/GET)
+- Обнаружение SQL ошибок в ответах
+- Time-based SQL injection detection
+- Поддержка различных СУБД (MySQL, PostgreSQL, MSSQL, Oracle)
 
-### 4. ⚡ Parameter Fuzzer (IDOR & Mass Assignment)
-- Анализ JSON-запросов на наличие числовых идентификаторов (ID, role, is_admin).
-- Автоматическая генерация вариаций (инкремент, декремент, UUID).
-- Сравнение длины ответов и HTTP-кодов для выявления потенциальных IDOR.
+### 5. Parameter Fuzzer (IDOR/Mass Assignment)
+- Автоматическое обнаружение интересных параметров (id, user_id, role и т.д.)
+- Fuzzing с различными значениями
+- Обнаружение IDOR уязвимостей
+- Тестирование Mass Assignment
+- Поддержка path traversal и injection payloads
 
-## 🚀 Установка и запуск
+## 📦 Установка
 
-### Требования
-- Python 3.6+
+```bash
+git clone <your-repo>
+cd scanner
+pip install -r requirements.txt
+```
 
-### Быстрый старт
-
-1. **Клонируйте репозиторий**:
-   ```bash
-   git clone https://github.com/nExytq/scanner.git
-   cd scanner
-   ```
-
-2. **Создайте виртуальное окружение**:
-   ```bash
-   python -m venv venv
-   # Windows:
-   .\\venv\\Scripts\\activate
-   # Linux/macOS:
-   source venv/bin/activate
-   ```
-
-3. **Установите зависимости**:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Запустите инструмент**:
-   ```bash
-   python main.py
-   ```
-
-## 🎮 Использование
-
-Инструмент поддерживает два режима работы:
+## 🎯 Использование
 
 ### Интерактивный режим
-Просто запустите `python main.py` и следуйте инструкциям в меню.
-
-### CLI режим (для автоматизации)
 ```bash
-python main.py <URL> -m <mode> [-p <json_payload>]
+python main.py
 ```
-- `-m`: Режим сканирования (`headers`, `js`, `xss`, `fuzz`, `all`).
-- `-p`: JSON-пейлоад для модуля фаззинга.
 
-## ⚠️ Дисклеймер
+### CLI режим
 
-Данный инструмент создан исключительно в образовательных целях и для проведения **легального** тестирования на проникновение. Автор не несет ответственности за любое использование данного ПО в противоправных целях. Используйте только на ресурсах, на которые у вас есть разрешение.
+**Header Scanner:**
+```bash
+python main.py http://example.com -m headers
+```
 
----
-*Made with ❤️ for the security community*"
+**JS Analyzer:**
+```bash
+python main.py http://example.com -m js
+```
+
+**XSS Scanner:**
+```bash
+python main.py http://example.com -m xss
+```
+
+**SQL Injection Scanner:**
+```bash
+python main.py http://example.com -m sql
+```
+
+**Parameter Fuzzer:**
+```bash
+python main.py http://example.com/api/user -m fuzz -p '{"user_id": 123, "role": "user"}'
+```
+
+**Запустить все сканеры:**
+```bash
+python main.py http://example.com -m all
+```
+
+## ⚙️ Конфигурация
+
+Все настройки находятся в `config.py`:
+
+- `SECURITY_HEADERS` - список проверяемых security headers
+- `SENSITIVE_FILES` - список чувствительных файлов для поиска
+- `JS_PATTERNS` - regex паттерны для поиска в JS файлах
+- `INTERESTING_KEYS` - параметры для fuzzing
+- `XSS_PAYLOADS` - XSS payloads для тестирования
+- `SQL_PAYLOADS` - SQL injection payloads
+- `SQL_ERRORS` - паттерны SQL ошибок
+
+## 🔧 Расширение функционала
+
+### Добавление новых payloads
+
+Отредактируйте `config.py` и добавьте свои payloads в соответствующие списки:
+
+```python
+XSS_PAYLOADS = [
+    "<script>alert(1)</script>",
+    "ваш_новый_payload",
+]
+```
+
+### Добавление новых паттернов для JS Analyzer
+
+```python
+JS_PATTERNS = {
+    'Your Pattern Name': r'your_regex_pattern',
+}
+```
+
+## ⚠️ Важно
+
+**ИСПОЛЬЗУЙТЕ ТОЛЬКО ДЛЯ ЛЕГАЛЬНОГО ТЕСТИРОВАНИЯ!**
+
+- Получите письменное разрешение перед тестированием
+- Не используйте на production системах без согласования
+- Соблюдайте законы вашей страны
+- Используйте только в образовательных целях или в рамках bug bounty программ
+
+## 📝 Лицензия
+
+Для образовательных целей и легального пентестинга.
+
+## 🤝 Вклад
+
+Приветствуются pull requests с новыми функциями и улучшениями!
+
+## 📧 Контакты
+
+Для вопросов и предложений создавайте issues в репозитории.

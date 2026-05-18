@@ -1,18 +1,13 @@
-import requests
+﻿import requests
 import re
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
+from config import JS_PATTERNS
 
 class JSAnalyzer:
     def __init__(self, target_url):
         self.target_url = target_url if target_url.startswith('http') else f'http://{target_url}'
-        # Регулярные выражения для путей API и ключей
-        self.patterns = {
-            'API Endpoint': r'\/api\/v[0-9]\/[\w\/-]+',
-            'Firebase Key': r'AIza[0-9A-Za-z-_]{35}',
-            'AWS Access Key': r'AKIA[0-9A-Z]{16}',
-            'Generic Secret': r'(?i)(secret|key|token|auth|password)\s*[:=]\s*["\']([a-zA-Z0-9_\-]{16,})["\']'
-        }
+        self.patterns = JS_PATTERNS
 
     def analyze(self):
         print(f"\n[*] Analyzing JS files for {self.target_url}...")

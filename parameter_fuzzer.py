@@ -1,25 +1,28 @@
-import requests
+﻿import requests
 import json
 import uuid
+from config import INTERESTING_KEYS, FUZZ_VALUES_INT, FUZZ_VALUES_STR
 
 class ParameterFuzzer:
     def __init__(self, target_url, json_payload):
         self.target_url = target_url
         self.payload = json_payload
-        self.interesting_keys = ['id', 'user_id', 'role', 'is_admin', 'account_id', 'profile_id']
+        self.interesting_keys = INTERESTING_KEYS
+        self.fuzz_values_int = FUZZ_VALUES_INT
+        self.fuzz_values_str = FUZZ_VALUES_STR
 
     def _get_fuzz_values(self, value):
         fuzz_list = []
         if isinstance(value, int):
+            fuzz_list.extend(self.fuzz_values_int)
             fuzz_list.append(value + 1)
             fuzz_list.append(value - 1)
-            fuzz_list.append(0)
-            fuzz_list.append(1)
         elif isinstance(value, str):
             if value.isdigit():
                 val_int = int(value)
                 fuzz_list.append(str(val_int + 1))
                 fuzz_list.append(str(val_int - 1))
+            fuzz_list.extend(self.fuzz_values_str)
             fuzz_list.append(str(uuid.uuid4()))
         return fuzz_list
 

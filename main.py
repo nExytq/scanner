@@ -1,10 +1,11 @@
-import argparse
+﻿import argparse
 import json
 import os
 from header_scanner import HeaderScanner
 from parameter_fuzzer import ParameterFuzzer
 from xss_scanner import XSSScanner
 from js_analyzer import JSAnalyzer
+from sql_scanner import SQLScanner
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -12,13 +13,14 @@ def clear_screen():
 def print_banner():
     print("""
     ==================================================
-    🛡️  PEN-TEST MULTI-TOOL v2.0 (Interactive Mode)
+    🛡️  PEN-TEST MULTI-TOOL v2.1 (Interactive Mode)
     ==================================================
     1. 🔍 Header & Config Scanner
     2. 📜 JS File Analyzer (API & Keys)
     3. 💉 XSS Form Scanner
-    4. ⚡ Parameter Fuzzer (IDOR/Mass Assignment)
-    5. 🚀 Run ALL Scans
+    4. 💊 SQL Injection Scanner
+    5. ⚡ Parameter Fuzzer (IDOR/Mass Assignment)
+    6. 🚀 Run ALL Scans
     0. ❌ Exit
     ==================================================
     """)
@@ -36,6 +38,9 @@ def run_scanner(mode, url, payload=None):
 
     if mode in ['xss', 'all']:
         XSSScanner(url).run()
+    
+    if mode in ['sql', 'all']:
+        SQLScanner(url).run()
 
     if mode in ['fuzz', 'all']:
         if payload:
@@ -53,7 +58,7 @@ def run_scanner(mode, url, payload=None):
 def main():
     parser = argparse.ArgumentParser(description="Multi-Tool for Legal Penetration Testing")
     parser.add_argument("url", nargs='?', help="Target URL")
-    parser.add_argument("-m", "--mode", choices=['headers', 'fuzz', 'xss', 'js', 'all'], help="Scan mode")
+    parser.add_argument("-m", "--mode", choices=['headers', 'fuzz', 'xss', 'js', 'sql', 'all'], help="Scan mode")
     parser.add_argument("-p", "--payload", help="JSON payload for fuzzer")
 
     args = parser.parse_args()
@@ -74,7 +79,7 @@ def main():
             print("Goodbye! 👋")
             break
         
-        if choice not in ['1', '2', '3', '4', '5']:
+        if choice not in ['1', '2', '3', '4', '5', '6']:
             input("❌ Invalid option! Press Enter to try again...")
             continue
 
@@ -83,8 +88,9 @@ def main():
             '1': 'headers',
             '2': 'js',
             '3': 'xss',
-            '4': 'fuzz',
-            '5': 'all'
+            '4': 'sql',
+            '5': 'fuzz',
+            '6': 'all'
         }
         selected_mode = mode_map[choice]
 

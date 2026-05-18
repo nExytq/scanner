@@ -1,16 +1,11 @@
-import requests
+﻿import requests
 from bs4 import BeautifulSoup
+from config import XSS_PAYLOADS
 
 class XSSScanner:
     def __init__(self, target_url):
         self.target_url = target_url if target_url.startswith('http') else f'http://{target_url}'
-        self.payloads = [
-            """<script>alert(1)</script>""",
-            """<img src=x onerror=alert(1)>""",
-            """' "><script>alert(1)</script>""",
-            """<svg onload=alert(1)>""",
-            """javascript:alert(1)"""
-        ]
+        self.payloads = XSS_PAYLOADS
 
     def find_forms(self, url):
         try:
@@ -42,10 +37,13 @@ class XSSScanner:
 
                 try:
                     method = form.get('method', 'get').lower()
+                    action = form.get('action', self.target_url)
+                    target = action if action.startswith('http') else f"{self.target_url.rstrip('/')}/{action.lstrip('/')}"
+                    
                     if method == 'post':
-                        res = requests.post(self.target_url, data=data, timeout=10)
+                        res = requests.post(target, data=data, timeout=10)
                     else:
-                        res = requests.get(self.target_url, params=data, timeout=10)
+                        res = requests.get(target, params=data, timeout=10)
                     
                     if payload in res.text:
                         print(f"[+] POTENTIAL XSS: Payload {payload} reflected in response!")

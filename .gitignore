@@ -1,20 +1,68 @@
-# Byte-compiled / optimized / DLL files
+﻿# Python
 __pycache__/
 *.py[cod]
 *$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+PIPFILE.lock
 
-# Virtual Environments
+# Virtual Environment
 venv/
 ENV/
 env/
+.venv
 
-# IDEs
+# IDE
 .vscode/
 .idea/
-
-# OS files
+*.swp
+*.swo
+*~
 .DS_Store
-Thumbs.db
 
-# Environment variables
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Logs
+*.log
+logs/
+
+# Results
+results/
+reports/
+scans/
+*.json
+*.xml
+*.html
+
+# Sensitive data
 .env
+.env.local
+secrets/
+credentials/
+*.key
+*.pem
+
+# OS
+Thumbs.db
+.DS_Store
