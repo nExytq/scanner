@@ -13,7 +13,7 @@ def clear_screen():
 def print_banner():
     print("""
     ==================================================
-    🛡️  PEN-TEST MULTI-TOOL v2.1 (Interactive Mode)
+    🛡️  PEN-TEST MULTI-TOOL v2.2 (Interactive Mode)
     ==================================================
     1. 🔍 Header & Config Scanner
     2. 📜 JS File Analyzer (API & Keys)
@@ -25,34 +25,80 @@ def print_banner():
     ==================================================
     """)
 
+def print_summary(results):
+    print("\n" + "="*50)
+    print("📊 SCAN SUMMARY")
+    print("="*50)
+    
+    if 'headers' in results:
+        status = "✅" if results['headers'] == 0 else "❎"
+        print(f"{status} Header & Config Scanner: {results['headers']} issues found")
+    
+    if 'js' in results:
+        status = "✅" if results['js'] == 0 else "❎"
+        print(f"{status} JS File Analyzer: {results['js']} findings")
+    
+    if 'xss' in results:
+        status = "✅" if results['xss'] == 0 else "❎"
+        print(f"{status} XSS Scanner: {results['xss']} vulnerabilities found")
+    
+    if 'sql' in results:
+        status = "✅" if results['sql'] == 0 else "❎"
+        print(f"{status} SQL Injection Scanner: {results['sql']} vulnerabilities found")
+    
+    if 'fuzz' in results:
+        status = "✅" if results['fuzz'] == 0 else "❎"
+        print(f"{status} Parameter Fuzzer: {results['fuzz']} potential issues found")
+    
+    print("="*50)
+    
+    total_issues = sum(results.values())
+    if total_issues == 0:
+        print("✅ No issues detected!")
+    else:
+        print(f"⚠️  Total issues detected: {total_issues}")
+    print("="*50)
+
 def run_scanner(mode, url, payload=None):
     print(f"\n[!] Target: {url}")
     print(f"[!] Mode: {mode}")
     print("--------------------------------------------------")
+    
+    results = {}
 
     if mode in ['headers', 'all']:
-        HeaderScanner(url).run()
+        result = HeaderScanner(url).run()
+        results['headers'] = result
 
     if mode in ['js', 'all']:
-        JSAnalyzer(url).run()
+        result = JSAnalyzer(url).run()
+        results['js'] = result
 
     if mode in ['xss', 'all']:
-        XSSScanner(url).run()
+        result = XSSScanner(url).run()
+        results['xss'] = result
     
     if mode in ['sql', 'all']:
-        SQLScanner(url).run()
+        result = SQLScanner(url).run()
+        results['sql'] = result
 
     if mode in ['fuzz', 'all']:
         if payload:
             try:
                 payload_dict = json.loads(payload)
-                ParameterFuzzer(url, payload_dict).start()
+                result = ParameterFuzzer(url, payload_dict).start()
+                results['fuzz'] = result
             except json.JSONDecodeError:
                 print("[!] Error: Invalid JSON provided in payload")
         else:
             print("\n[-] Skipping Parameter Fuzzer: No JSON payload provided.")
 
     print("\n--------------------------------------------------")
+    
+    # Показываем сводку только если был запущен массовый скан или несколько сканеров
+    if mode == 'all' or len(results) > 1:
+        print_summary(results)
+    
     print("[!] Operation completed.")
 
 def main():

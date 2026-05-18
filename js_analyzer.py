@@ -8,6 +8,7 @@ class JSAnalyzer:
     def __init__(self, target_url):
         self.target_url = target_url if target_url.startswith('http') else f'http://{target_url}'
         self.patterns = JS_PATTERNS
+        self.findings_count = 0
 
     def analyze(self):
         print(f"\n[*] Analyzing JS files for {self.target_url}...")
@@ -30,6 +31,7 @@ class JSAnalyzer:
                             # match может быть кортежем если есть группы в regex
                             val = match[1] if isinstance(match, tuple) else match
                             print(f"[+] Found {name} in {js_url}: {val}")
+                            self.findings_count += 1
                 except Exception as e:
                     print(f"[-] Could not read {js_url}: {e}")
 
@@ -38,3 +40,4 @@ class JSAnalyzer:
 
     def run(self):
         self.analyze()
+        return self.findings_count

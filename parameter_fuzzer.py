@@ -10,6 +10,7 @@ class ParameterFuzzer:
         self.interesting_keys = INTERESTING_KEYS
         self.fuzz_values_int = FUZZ_VALUES_INT
         self.fuzz_values_str = FUZZ_VALUES_STR
+        self.vulnerabilities_found = 0
 
     def _get_fuzz_values(self, value):
         fuzz_list = []
@@ -67,8 +68,10 @@ class ParameterFuzzer:
 
                         if res_code == 200 or res_len == base_len:
                             print(f"[+] POTENTIAL IDOR: {key} -> {fuzz_val} | Code: {res_code}, Len: {res_len}")
+                            self.vulnerabilities_found += 1
                     except Exception as e:
                         print(f"[-] Error fuzzing {key} with {fuzz_val}: {e}")
 
     def start(self):
         self.run()
+        return self.vulnerabilities_found

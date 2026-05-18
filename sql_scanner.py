@@ -8,6 +8,7 @@ class SQLScanner:
         self.target_url = target_url if target_url.startswith('http') else f'http://{target_url}'
         self.payloads = SQL_PAYLOADS
         self.error_patterns = SQL_ERRORS
+        self.vulnerabilities_found = 0
 
     def test_url_params(self):
         """Test GET parameters for SQL injection"""
@@ -35,11 +36,13 @@ class SQLScanner:
                         if error.lower() in response.text.lower():
                             print(f"[+] POTENTIAL SQL INJECTION: {param_name} with payload: {payload}")
                             print(f"    Error found: {error}")
+                            self.vulnerabilities_found += 1
                             break
                     
                     # Check for time-based injection
                     if response.elapsed.total_seconds() > 5 and 'SLEEP' in payload.upper():
                         print(f"[+] POTENTIAL TIME-BASED SQL INJECTION: {param_name} with payload: {payload}")
+                        self.vulnerabilities_found += 1
                         
                 except Exception as e:
                     print(f"[-] Error testing {param_name}: {e}")
@@ -87,6 +90,7 @@ class SQLScanner:
                             if error.lower() in res.text.lower():
                                 print(f"[+] POTENTIAL SQL INJECTION in form #{i+1} with payload: {payload}")
                                 print(f"    Error found: {error}")
+                                self.vulnerabilities_found += 1
                                 break
                                 
                     except Exception as e:
@@ -98,3 +102,4 @@ class SQLScanner:
     def run(self):
         self.test_url_params()
         self.test_forms()
+        return self.vulnerabilities_found

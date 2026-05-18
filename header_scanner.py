@@ -10,6 +10,7 @@ class HeaderScanner:
         self.target_url = self._ensure_http_prefix(target_url)
         self.security_headers = SECURITY_HEADERS
         self.sensitive_files = SENSITIVE_FILES
+        self.issues_found = 0
 
     def _ensure_http_prefix(self, url):
         if not url.startswith('http://') and not url.startswith('https://'):
@@ -30,18 +31,23 @@ class HeaderScanner:
                     # Basic analysis for some headers
                     if header == "Strict-Transport-Security" and "max-age=0" in header_value:
                         logging.warning(f"[!] WARNING: HSTS max-age is 0, effectively disabling it.")
+                        self.issues_found += 1
                     if header == "X-Frame-Options" and header_value.lower() not in ["deny", "sameorigin"]:
                         logging.warning(f"[!] WARNING: X-Frame-Options is '{header_value}', consider 'DENY' or 'SAMEORIGIN'.")
+                        self.issues_found += 1
                     if header == "Content-Security-Policy" or header == "Content-Security-Policy-Report-Only":
                         if "unsafe-inline" in header_value or "unsafe-eval" in header_value or "'*'" in header_value:
                             logging.warning(f"[!] WARNING: CSP contains potentially insecure directives like 'unsafe-inline', 'unsafe-eval', or wildcard '*'.")
+                            self.issues_found += 1
                 else:
                     logging.warning(f"[-] {header}: Missing")
+                    self.issues_found += 1
 
             # CORS check
             cors = headers.get("Access-Control-Allow-Origin")
             if cors == "*":
                 logging.warning(f"[!] WARNING: CORS policy is open (Access-Control-Allow-Origin: *)")
+                self.issues_found += 1
             elif cors:
                 logging.info(f"[*] CORS policy: {cors}")
             else:
@@ -60,8 +66,10 @@ class HeaderScanner:
                 response = requests.get(url, timeout=5, allow_redirects=False)
                 if response.status_code == 200:
                     logging.info(f"[+] FOUND: {url} (Status: {response.status_code})")
+                    self.issues_found += 1
                 elif response.status_code in [401, 403]:
                     logging.warning(f"[!] POSSIBLY FOUND (Restricted): {url} (Status: {response.status_code})")
+                    self.issues_found += 1
                 elif 300 <= response.status_code < 400:
                     logging.info(f"[*] Redirect for {url} (Status: {response.status_code}) -> {response.headers.get('Location', 'N/A')}")
             except requests.exceptions.RequestException as e:
@@ -72,3 +80,4 @@ class HeaderScanner:
     def run(self):
         self.scan_headers()
         self.scan_configs()
+        return self.issues_found

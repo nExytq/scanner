@@ -6,6 +6,7 @@ class XSSScanner:
     def __init__(self, target_url):
         self.target_url = target_url if target_url.startswith('http') else f'http://{target_url}'
         self.payloads = XSS_PAYLOADS
+        self.vulnerabilities_found = 0
 
     def find_forms(self, url):
         try:
@@ -47,8 +48,10 @@ class XSSScanner:
                     
                     if payload in res.text:
                         print(f"[+] POTENTIAL XSS: Payload {payload} reflected in response!")
+                        self.vulnerabilities_found += 1
                 except Exception as e:
                     print(f"[-] Error sending payload: {e}")
 
     def run(self):
         self.scan()
+        return self.vulnerabilities_found
